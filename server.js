@@ -9,7 +9,14 @@ const cors     = require('cors');
 const fetch    = require('node-fetch');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://nf-indol-two.vercel.app',
+    'http://localhost:3000'
+  ],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json({ limit: '10mb' }));
 
 // Health check
