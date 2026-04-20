@@ -367,12 +367,31 @@ option{background:#0d0d28;}
   background:linear-gradient(90deg,var(--txt) 0%,var(--pri) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .topbar p{font-size:12px;color:var(--txt2);margin-top:3px;}
 @media (max-width: 768px) {
-  .app-layout {
-    flex-direction: column !important;
+  #menuBtn {
+    display: block !important;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 9999;
+    background: #2d2066;
+    color: white;
+    border: none;
+    font-size: 24px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
   }
   .sidebar {
-    width: 100% !important;
-    height: auto !important;
+    position: fixed !important;
+    left: -100% !important;
+    top: 0 !important;
+    height: 100vh !important;
+    width: 280px !important;
+    transition: left 0.3s ease !important;
+    z-index: 999 !important;
+  }
+  .sidebar.open {
+    left: 0 !important;
   }
   .main-content {
     width: 100% !important;
@@ -437,6 +456,8 @@ option{background:#0d0d28;}
 </div>
 
 <!-- SIDEBAR -->
+<button id="menuBtn" onclick="toggleMenu()" 
+style="display:none">☰</button>
 <div class="sidebar">
   <div class="sb-logo">
     <div class="logo-orb">🧠</div>
@@ -1271,6 +1292,10 @@ function go(pg){
 }
 
 window.addEventListener('load',init);
+function toggleMenu() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('open');
+}
 </script>
 </body>
 </html>
