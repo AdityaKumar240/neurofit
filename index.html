@@ -366,6 +366,19 @@ option{background:#0d0d28;}
 .topbar h1{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:700;
   background:linear-gradient(90deg,var(--txt) 0%,var(--pri) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .topbar p{font-size:12px;color:var(--txt2);margin-top:3px;}
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column !important;
+  }
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .main-content {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
 </style>
 </head>
 <body>
