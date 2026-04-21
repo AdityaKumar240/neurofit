@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#03030a">
 <title>NeuroFit AI — Intelligent Fitness System</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -51,11 +53,14 @@ body::after{
 /* ── SIDEBAR ── */
 .sidebar{
   width:var(--sidebar);min-height:100vh;
-  background:linear-gradient(180deg,rgba(10,10,30,0.95) 0%,rgba(7,7,20,0.98) 100%);
+  background:linear-gradient(180deg,rgba(10,10,30,0.97) 0%,rgba(7,7,20,0.99) 100%);
   border-right:1px solid var(--brd);
   display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;
-  backdrop-filter:blur(20px);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  transition:left 0.28s cubic-bezier(0.4,0,0.2,1),box-shadow 0.28s;
+  overflow-y:auto;overflow-x:hidden;
 }
+.sidebar.open{box-shadow:8px 0 40px rgba(0,0,0,0.6);}
 .sb-logo{padding:24px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--brd);}
 .logo-orb{
   width:38px;height:38px;border-radius:12px;
@@ -305,8 +310,8 @@ option{background:#0d0d28;}
 /* ── MODAL ── */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,0.9);
-  z-index:1000;display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(6px);
+  z-index:99999;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 .modal{
   background:linear-gradient(135deg,rgba(13,13,40,0.98),rgba(10,10,25,0.99));
@@ -366,37 +371,325 @@ option{background:#0d0d28;}
 .topbar h1{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:700;
   background:linear-gradient(90deg,var(--txt) 0%,var(--pri) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .topbar p{font-size:12px;color:var(--txt2);margin-top:3px;}
-@media (max-width: 768px) {
-  #menuBtn {
-    display: block !important;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 9999;
-    background: #2d2066;
-    color: white;
-    border: none;
-    font-size: 24px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+/* ════════════════════════════════════════
+   RESPONSIVE — All Devices
+   ════════════════════════════════════════ */
+
+/* ── Hamburger Button (hidden on desktop) ── */
+#menuBtn {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 9999;
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg,var(--pri),#7c3aed);
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 18px; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(168,85,247,0.45);
+  align-items: center; justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+#menuBtn:active { transform: scale(0.92); }
+
+/* ── Sidebar overlay (tap to close) ── */
+#sideOverlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.72); z-index: 200;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+#sideOverlay.show { display: block; }
+
+/* ════════ LARGE DESKTOP ≥ 1400px ════════ */
+@media (min-width: 1400px) {
+  :root { --sidebar: 260px; }
+  .stats-grid { grid-template-columns: repeat(4,1fr); }
+  .page { padding: 36px 44px; }
+  .topbar h1 { font-size: 28px; }
+}
+
+/* ════════ STANDARD DESKTOP 1025–1399px ════════ */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .stats-grid { grid-template-columns: repeat(4,1fr); }
+}
+
+/* ════════ TABLET LANDSCAPE 900–1024px ════════ */
+@media (min-width: 900px) and (max-width: 1024px) {
+  :root { --sidebar: 200px; }
+  .page { padding: 26px 24px; }
+  .stats-grid { grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .stat-val { font-size: 22px; }
+  .g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .ach-grid { grid-template-columns: repeat(3,1fr); }
+  .topbar h1 { font-size: 20px; }
+}
+
+/* ════════ TABLET PORTRAIT 600–899px ════════ */
+@media (min-width: 600px) and (max-width: 899px) {
+  /* Sidebar slides in — show hamburger */
+  #menuBtn { display: flex; }
   .sidebar {
-    position: fixed !important;
-    left: -100% !important;
-    top: 0 !important;
-    height: 100vh !important;
-    width: 280px !important;
-    transition: left 0.3s ease !important;
-    z-index: 999 !important;
+    left: -260px; width: 260px;
+    transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
+    z-index: 300;
   }
-  .sidebar.open {
-    left: 0 !important;
+  .sidebar.open { left: 0; }
+  .main { margin-left: 0 !important; width: 100%; }
+
+  .page { padding: 70px 22px 28px; }
+  .topbar { flex-direction: row; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; padding-bottom: 16px; }
+  .topbar h1 { font-size: 20px; }
+
+  /* Stats — 2×2 grid */
+  .stats-grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .stat-val { font-size: 24px; }
+
+  /* Grids */
+  .g2  { grid-template-columns: 1fr 1fr; }
+  .g14 { grid-template-columns: 1fr 1fr; }
+  .g3  { grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Form rows stay 2-col on tablet */
+  .frow { grid-template-columns: 1fr 1fr; }
+
+  /* Achievements 3-col */
+  .ach-grid { grid-template-columns: repeat(3,1fr); gap: 10px; }
+
+  .chat-wrap { height: calc(100vh - 260px); }
+  .bubble { max-width: 80%; }
+  .modal { padding: 28px 22px; }
+  .card { padding: 18px; }
+}
+
+/* ════════ MOBILE LARGE 480–599px ════════ */
+@media (min-width: 480px) and (max-width: 599px) {
+  #menuBtn { display: flex; }
+  .sidebar {
+    left: -260px; width: 260px;
+    transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
+    z-index: 300;
   }
-  .main-content {
-    width: 100% !important;
-    margin-left: 0 !important;
+  .sidebar.open { left: 0; }
+  .main { margin-left: 0 !important; width: 100%; }
+
+  .page { padding: 68px 16px 24px; }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 16px; padding-bottom: 14px; }
+  .topbar h1 { font-size: 18px; }
+  .topbar p  { font-size: 11px; }
+
+  .stats-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .stat-val   { font-size: 22px; }
+  .stat-lbl   { font-size: 9px; }
+
+  .g2, .g14  { grid-template-columns: 1fr; }
+  .g3        { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .frow      { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .ach-grid  { grid-template-columns: repeat(2,1fr); gap: 10px; }
+  .ach-ico   { font-size: 26px; }
+
+  .chat-wrap { height: calc(100vh - 270px); min-height: 280px; }
+  .bubble    { max-width: 85%; font-size: 13px; }
+  .chips     { gap: 6px; }
+  .chip      { font-size: 10px; padding: 5px 10px; }
+
+  .modal        { padding: 24px 16px; border-radius: 16px; max-height: 95vh; }
+  .modal-title  { font-size: 20px; }
+  .card         { padding: 16px; }
+  .macro-val    { font-size: 18px; }
+  .neural-ring  { width: 130px; height: 130px; }
+  .ring-num     { font-size: 26px; }
+
+  .log-row  { flex-wrap: wrap; gap: 6px; }
+  .log-wt   { width: auto; }
+  .log-dt   { width: auto; }
+  .log-bgs  { flex-wrap: wrap; }
+}
+
+/* ════════ MOBILE SMALL ≤ 479px ════════ */
+@media (max-width: 479px) {
+  #menuBtn { display: flex; top: 12px; left: 12px; width: 40px; height: 40px; font-size: 16px; border-radius: 10px; }
+
+  .sidebar {
+    left: -100vw; width: 80vw; max-width: 260px;
+    transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
+    z-index: 300;
   }
+  .sidebar.open { left: 0; }
+  .main { margin-left: 0 !important; width: 100%; }
+
+  .page { padding: 62px 12px 20px; }
+
+  /* Topbar */
+  .topbar { flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 14px; padding-bottom: 12px; }
+  .topbar h1 { font-size: 16px; }
+  .topbar p  { font-size: 10px; }
+  .topbar .btn-sm { font-size: 11px; padding: 5px 12px; }
+
+  /* Stats — 2×2 */
+  .stats-grid { grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 14px; }
+  .stat       { padding: 14px 12px; }
+  .stat-val   { font-size: 20px; }
+  .stat-lbl   { font-size: 9px; margin-bottom: 8px; }
+
+  /* All grids → single column */
+  .g2, .g14, .g3 { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Form rows → single column */
+  .frow { grid-template-columns: 1fr; gap: 0; }
+
+  /* Achievements — 2-col */
+  .ach-grid { grid-template-columns: repeat(2,1fr); gap: 8px; }
+  .ach-card { padding: 12px 8px; }
+  .ach-ico  { font-size: 24px; margin-bottom: 6px; }
+  .ach-name { font-size: 11px; }
+  .ach-desc { font-size: 9px; }
+
+  /* Chat */
+  .chat-wrap { height: calc(100vh - 260px); min-height: 260px; }
+  .chat-msgs { padding: 12px; gap: 10px; }
+  .bubble    { max-width: 90%; font-size: 12.5px; padding: 9px 12px; }
+  .chat-in   { font-size: 13px; }
+  .chat-bar  { padding: 10px 12px; gap: 8px; }
+  .chat-av   { width: 28px; height: 28px; font-size: 10px; }
+  .chips     { gap: 5px; margin-bottom: 10px; }
+  .chip      { font-size: 10px; padding: 4px 9px; }
+
+  /* Cards */
+  .card       { padding: 14px 12px; border-radius: 12px; }
+  .card-title { font-size: 9px; margin-bottom: 12px; }
+
+  /* Forms */
+  .fi   { padding: 9px 12px; font-size: 13px; }
+  .fl   { font-size: 10px; margin-bottom: 5px; }
+  .fg   { margin-bottom: 11px; }
+  .btn-full { padding: 12px; font-size: 13px; }
+
+  /* Macros */
+  .macros-row { gap: 6px; }
+  .macro      { padding: 10px 8px; border-radius: 10px; }
+  .macro-val  { font-size: 16px; }
+  .macro-lbl  { font-size: 8px; }
+
+  /* Neural ring */
+  .neural-ring       { width: 120px; height: 120px; }
+  .neural-ring svg   { width: 120px; height: 120px; }
+  .ring-num          { font-size: 24px; }
+  .neural-ring-title { font-size: 9px; }
+
+  /* Modal */
+  .modal       { padding: 20px 14px; border-radius: 14px; max-height: 96vh; }
+  .modal-title { font-size: 18px; }
+  .modal-sub   { font-size: 12px; margin-bottom: 16px; }
+  .modal-logo .logo-orb { width: 32px; height: 32px; font-size: 16px; }
+
+  /* Progress logs */
+  .log-row  { flex-wrap: wrap; gap: 6px; padding: 10px 0; }
+  .log-wt   { width: auto; font-size: 14px; }
+  .log-dt   { width: auto; font-size: 10px; }
+  .log-bgs  { flex-wrap: wrap; gap: 4px; }
+  .badge    { font-size: 9px; padding: 2px 7px; }
+
+  /* Exercise list */
+  .ex-item  { padding: 9px 10px; gap: 8px; }
+  .ex-name  { font-size: 12px; }
+  .ex-det   { font-size: 10px; }
+  .ex-num   { width: 24px; height: 24px; font-size: 11px; }
+
+  /* Saved rows */
+  .saved-row  { padding: 10px 12px; gap: 8px; }
+  .saved-ttl  { font-size: 12px; }
+  .saved-meta { font-size: 10px; }
+  .saved-ico  { font-size: 18px; }
+
+  /* Sidebar */
+  .sb-logo { padding: 18px 16px; }
+  .logo-txt { font-size: 15px; }
+  .nav-item { font-size: 12px; padding: 9px 12px; }
+  .sb-footer { padding: 12px; }
+
+  /* Metric rows */
+  .metric-val { font-size: 16px; }
+  .metric-lbl { font-size: 11px; }
+
+/* ── iOS SAFE AREA ── */
+.sidebar { padding-bottom: env(safe-area-inset-bottom); }
+.page { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+.chat-bar { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+#menuBtn { top: calc(14px + env(safe-area-inset-top)); left: calc(14px + env(safe-area-inset-left)); }
+
+/* ── MOMENTUM SCROLL (iOS) ── */
+.sb-nav, .chat-msgs, .page, .main {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── TOUCH FEEDBACK ── */
+.nav-item, .btn, .chip, .card, .stat, .ach-card, .saved-row {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.nav-item:active { background: var(--pri-dim) !important; transform: scale(0.98); }
+.btn:active:not(:disabled) { transform: scale(0.97) !important; }
+.chip:active { background: var(--pri-dim); transform: scale(0.95); }
+
+/* ── BODY LOCK when sidebar open ── */
+body.sb-open { overflow: hidden; }
+
+/* ── IMPROVED CARD POLISH ── */
+.card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid var(--brd);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.card:hover {
+  border-color: var(--brd2);
+  box-shadow: 0 0 30px rgba(168,85,247,0.1), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── STAT CARD POLISH ── */
+.stat {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--stat-color, var(--pri)), transparent);
+  opacity: 0.6;
+}
+
+/* ── BETTER BADGE ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* ── SAVED ROW POLISH ── */
+.saved-row:active { background: rgba(168,85,247,0.06); }
+
+/* ── SMOOTH PAGE TRANSITIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page.active { animation: fadeUp 0.25s ease forwards; }
+
+/* ── MOBILE SMALL: extra safe-area fix ── */
+@media (max-width: 479px) {
+  .page { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  .chat-wrap { height: calc(100vh - 260px - env(safe-area-inset-bottom)); }
 }
 </style>
 </head>
@@ -455,10 +748,18 @@ option{background:#0d0d28;}
   </div>
 </div>
 
+<!-- HAMBURGER + OVERLAY -->
+<button id="menuBtn" onclick="toggleMenu()" aria-label="Open menu" style="display:none">
+  <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+    <rect width="18" height="2" rx="1" fill="white"/>
+    <rect y="6" width="12" height="2" rx="1" fill="white" opacity="0.7"/>
+    <rect y="12" width="18" height="2" rx="1" fill="white"/>
+  </svg>
+</button>
+<div id="sideOverlay" onclick="closeSidebar()"></div>
+
 <!-- SIDEBAR -->
-<button id="menuBtn" onclick="toggleMenu()" 
-style="display:none">☰</button>
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl" style="visibility:hidden;pointer-events:none">
   <div class="sb-logo">
     <div class="logo-orb">🧠</div>
     <div class="logo-txt">Neuro<span>Fit</span></div>
@@ -885,6 +1186,11 @@ async function init(){
 
 function boot(){
   document.getElementById('obModal').style.display='none';
+  // Reveal sidebar and hamburger now that user is logged in
+  const sb = document.getElementById('sidebarEl');
+  sb.style.visibility=''; sb.style.pointerEvents='';
+  // Show hamburger only on mobile
+  if(window.innerWidth < 900) document.getElementById('menuBtn').style.display='flex';
   updateSidebar(); updateDash(); loadW(); loadD(); loadProg(); loadMetrics();
   checkAch();
 }
@@ -1289,13 +1595,29 @@ function go(pg){
   document.getElementById('p-'+pg).classList.add('active');
   document.getElementById('n-'+pg).classList.add('active');
   window.scrollTo(0,0);
+  // Auto-close sidebar on mobile/tablet after navigating
+  if(window.innerWidth < 900) closeSidebar();
 }
 
-window.addEventListener('load',init);
-function toggleMenu() {
-  const sidebar = document.querySelector('.sidebar');
-  sidebar.classList.toggle('open');
+/* ── SIDEBAR TOGGLE ── */
+function toggleMenu(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sideOverlay');
+  if(sb.classList.contains('open')){ closeSidebar(); }
+  else { sb.classList.add('open'); ov.classList.add('show'); document.body.classList.add('sb-open'); }
 }
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sideOverlay').classList.remove('show');
+  document.body.classList.remove('sb-open');
+}
+
+/* ── CLOSE SIDEBAR ON RESIZE TO DESKTOP ── */
+window.addEventListener('resize',()=>{
+  if(window.innerWidth >= 900) closeSidebar();
+});
+
+window.addEventListener('load',init);
 </script>
 </body>
 </html>
